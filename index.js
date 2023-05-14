@@ -1,14 +1,17 @@
 const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
-const authRoute = require("./routes/auth")
+const authRoute = require("./routes/auth");
+const dotenv = require("dotenv");
+
+dotenv.config();
 
 app.listen(4000,(req,res) => {
-    console.log("Jai shree shyam")
+    console.log("connected to the server successfully")
 })
 
 mongoose.set("strictQuery",false)
-mongoose.connect("mongodb+srv://Manish:7993819446@nodejsproject.rucaek2.mongodb.net/userAuth?retryWrites=true&w=majority")
+mongoose.connect(process.env.MONGO_URL)
 .then(() => {
     console.log("connected to the database successfully")
 })

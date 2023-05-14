@@ -1,5 +1,8 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
+const dotenv = require("dotenv");
+
+dotenv.config();
 
 const auth = async (req,res,next) => {
     let token;
@@ -9,7 +12,7 @@ const auth = async (req,res,next) => {
             token = req.headers.authorization.split(' ')[1];
 
             //verify token
-            const decoded = jwt.verify(token,"manish");
+            const decoded = jwt.verify(token,process.env.SECRET_KEY);
 
             //get user from the token
             req.user = await User.findById(decoded.userId).select("-password");

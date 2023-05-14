@@ -2,14 +2,16 @@ const router = require("express").Router();
 const User = require("../models/user");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const authMiddleware = require("../middleware/authMiddleware")
+const authMiddleware = require("../middleware/authMiddleware");
+const dotenv = require("dotenv")
+
+dotenv.config();
 
 //SIGNUP USER
 
 router.post("/register", async (req,res) => {
     try {
         //generate new password
-
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(req.body.password,salt);
 
@@ -44,19 +46,19 @@ router.post('/login', async(req,res) => {
     try {
         const {email,password} = req.body;
 
-        //check if user exists
+        //check if user exists or not
         const user = await User.findOne({ email });
         if (!user) {
-            return res.status(401).json({ message: 'Invalid credentials' });
+            return res.status(401).json({ message: 'Invalid user data' });
         }
 
-        //compare password
+        //compare user password
         const isValidPassword = await bcrypt.compare(password, user.password);
         if (!isValidPassword) {
-            return res.status(401).json({ message: 'Invalid credentials' });
+            return res.status(401).json({ message: 'Invalid user data' });
         }
 
-        // Create and send JWT token
+        //generate token
         const token = generateToken(user._id);
             res.status(200).json({ token });
         } 
@@ -78,7 +80,7 @@ router.get("/user",authMiddleware, async (req,res) => {
 })
 
 const generateToken = (id) => {
-    return jwt.sign({ id },"manish", {
+    return jwt.sign({ id },process.env.SECRET_KEY, {
       expiresIn: '30d',
     })
   }
